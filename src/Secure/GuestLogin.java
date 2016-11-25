@@ -92,7 +92,7 @@ public class GuestLogin extends javax.swing.JFrame {
     private void btnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitActionPerformed
         // TODO add your handling code here:
         conn = MySqlConnection.ConnectDB();
-        String sql = "Select * from guest where username=? and password=?";
+        String sql = "Select * from guest where Email=? and Password=?";
         try{
             pst = conn.prepareStatement(sql);
             pst.setString(1,txtusername.getText());
