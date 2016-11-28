@@ -49,7 +49,7 @@ public class CreateAccount extends JFrame{
 
         submit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                mysql.addNewGuest(txtusername.getText(), txtpassword.getText(), txtemail.getText());
+                mysql.addNewGuest(txtusername.getText(), new String(txtpassword.getPassword()), txtemail.getText());
                 CreateAccount.this.gl.setVisible(true);
                 CreateAccount.this.dispose();
           

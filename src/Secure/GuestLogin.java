@@ -57,7 +57,6 @@ public class GuestLogin extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new CreateAccount(database, GuestLogin.this);
-				System.out.println("adsfhadfsgrw");
 			}
         	
         });
@@ -89,12 +88,12 @@ public class GuestLogin extends JFrame {
      * @param evt
      */
     private void btnSubmitActionPerformed() {
-    	boolean valid = database.loginGuest(txtusername.getText(), txtpassword.getText());
+    	boolean valid = database.loginGuest(txtusername.getText(), new String(txtpassword.getPassword()));
     	if(valid) {
     		JOptionPane.showMessageDialog(null,"Welcome user");
-            
+    		
             this.setVisible(false);
-            
+            new HotelInfo().setVisible(true);
     	} else {
     		JOptionPane.showMessageDialog(null,"invalid username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
     	}

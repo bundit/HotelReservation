@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.*;
-import net.proteanit.sql.DbUtils;
+//import net.proteanit.sql.DbUtils;
 
 
 
@@ -27,9 +27,10 @@ public class HotelInfo extends javax.swing.JFrame {
      */
     public HotelInfo() {
         initComponents();
-        conn = MySqlConnection.ConnectDB();
+        //conn = MySqlConnection.ConnectDB();
       
         showHotel();
+        this.setLocationRelativeTo(null);
     }
     
     private void showHotel(){
@@ -38,7 +39,7 @@ public class HotelInfo extends javax.swing.JFrame {
             pst = conn.prepareStatement(sql);
             rs = pst.executeQuery();
             
-            hotel_table.setModel(DbUtils.resultSetToTableModel(rs));
+            //hotel_table.setModel(DbUtils.resultSetToTableModel(rs));
             
         }catch(Exception e){
             JOptionPane.showMessageDialog(null, e);
