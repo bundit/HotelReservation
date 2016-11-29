@@ -35,7 +35,7 @@ public class GuestLogin extends JFrame {
      * Initialize the components of this JFrame
      */
     private void initComponents() {
-    	this.setSize(500, 500);
+    	this.setSize(500, 300);
     	this.setLocationRelativeTo(null);
     	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     	this.setLayout(new GridLayout(0,4));
@@ -93,7 +93,7 @@ public class GuestLogin extends JFrame {
     		JOptionPane.showMessageDialog(null,"Welcome user");
     		
             this.setVisible(false);
-            new HotelInfo().setVisible(true);
+            new HotelInfo(database).setVisible(true);
     	} else {
     		JOptionPane.showMessageDialog(null,"invalid username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
     	}

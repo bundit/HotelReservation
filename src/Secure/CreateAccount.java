@@ -34,7 +34,7 @@ public class CreateAccount extends JFrame{
 		this.setVisible(true);
 	}
 	private void initComponents() {
-		this.setSize(500, 500);
+		this.setSize(500, 300);
     	this.setLocationRelativeTo(null);
     	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     	this.setLayout(new GridLayout(0,4));
