@@ -14,7 +14,7 @@ import javax.swing.*;
 public class MySqlConnection {
 	private final String DB = "jdbc:mysql://localhost/HotelReservation";
 	private final String DB_USER = "root"; //username for database 
-	private final String DB_PASSWORD = "Jongsuwan123123"; //password for database
+	private final String DB_PASSWORD = "enter your password here"; //password for database
 
 	MySqlConnection(){
 
@@ -72,7 +72,7 @@ public class MySqlConnection {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		//ResultSet rs = null;
-		
+
 		String sql = "INSERT\n"
 				+ "INTO guest\n"
 				+ "VALUES(null,?,?,?)";
@@ -91,6 +91,14 @@ public class MySqlConnection {
 			try{if(conn != null) conn.close();} catch (Exception e){}
 			try{if(ps != null) ps.close();} catch (Exception e){}
 		}
+	}
+
+	void cancelReservation(int reservationNum) {
+
+	}
+
+	void viewReservation(int reservationNum) {
+
 	}
 }
 

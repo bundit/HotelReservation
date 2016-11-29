@@ -47,12 +47,7 @@ public class GuestLogin extends JFrame {
         btnSubmit = new JButton("Submit");
         btnNewGuest = new JButton("New Guest");
 
-        btnSubmit.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                btnSubmitActionPerformed();
-            }
-        });
-        
+        btnSubmit.addActionListener(getBtnSubmitAction());
         btnNewGuest.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -87,18 +82,24 @@ public class GuestLogin extends JFrame {
      * The action performed by the submit button. If input is valid then 
      * @param evt
      */
-    private void btnSubmitActionPerformed() {
-    	boolean valid = database.loginGuest(txtusername.getText(), new String(txtpassword.getPassword()));
-    	if(valid) {
-    		JOptionPane.showMessageDialog(null,"Welcome user");
+    private ActionListener getBtnSubmitAction(){
+    	return new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				boolean valid = database.loginGuest(txtusername.getText(), new String(txtpassword.getPassword()));
+		    	if(valid) {
+		    		JOptionPane.showMessageDialog(null,"Welcome user");
+		    		
+		            GuestLogin.this.setVisible(false);
+		            new MainFrame(database).setVisible(true);
+		    	} else {
+		    		JOptionPane.showMessageDialog(null,"invalid username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
+		    	}
+			}
     		
-            this.setVisible(false);
-            new HotelInfo(database).setVisible(true);
-    	} else {
-    		JOptionPane.showMessageDialog(null,"invalid username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
-    	}
+    	};
     }
-
+ 
     /**
      * @param args the command line arguments
      */

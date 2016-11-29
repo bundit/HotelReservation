@@ -29,9 +29,7 @@ public class HotelInfo extends javax.swing.JFrame {
     public HotelInfo(MySqlConnection mysql) {
     	this.sql = mysql;
         initComponents();
-        //conn = MySqlConnection.ConnectDB();
-      
-        //showHotel();
+        setVisible(false);
     }
     
     private void showHotel(){
@@ -45,6 +43,18 @@ public class HotelInfo extends javax.swing.JFrame {
         }catch(Exception e){
             JOptionPane.showMessageDialog(null, e);
         }
+        
+        for(int i = 0; i < 100; i++	){ //currently just to display how info is structured
+    		resultsContainer.add(new JLabel("Hotel " + i));
+    		resultsContainer.add(new JLabel("Address " + i));
+    		resultsContainer.add(new JLabel("Stars " + i));
+    		resultsContainer.add(new JLabel("Room # " + i));
+    		resultsContainer.add(new JLabel("Available " + i));
+    		resultsContainer.add(new JLabel("Type " + i));
+    		resultsContainer.add(new JButton("Reserve this room"));
+    	}
+        
+        setVisible(true);
     }
 
 
@@ -57,7 +67,7 @@ public class HotelInfo extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
     	this.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-    	this.setSize(1200,1000);
+    	this.setSize(1000,800);
     	this.setLocationRelativeTo(null);
     	this.resultsContainer = new JPanel();
     	this.resultsContainer.setLayout(new GridLayout(0,7));
@@ -66,22 +76,16 @@ public class HotelInfo extends javax.swing.JFrame {
     	titles.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 25)); 
     	resultsContainer.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
     	titles.setLayout(new GridLayout(0,7));
-    	titles.add(new JLabel("<html><u><b><font size=\"+1\">Hotel Name</font></b></u></html>"));
+    	titles.add(new JLabel("<html><u><b><font size=\"+1\">Name</font></b></u></html>"));
     	titles.add(new JLabel("<html><u><b><font size=\"+1\">Address</font></b></u></html>"));
     	titles.add(new JLabel("<html><u><b><font size=\"+1\">Stars</font></b></u></html>"));
-    	titles.add(new JLabel("<html><u><b><font size=\"+1\">Room Number</font></b></u></html>"));
+    	titles.add(new JLabel("<html><u><b><font size=\"+1\">Room #</font></b></u></html>"));
     	titles.add(new JLabel("<html><u><b><font size=\"+1\">Availability</font></b></u></html>"));
     	titles.add(new JLabel("<html><u><b><font size=\"+1\">Type</font></b></u></html>"));
-    	titles.add(new JLabel("<html><u><b><font size=\"+1\">Reserve this room</font></b></u></html>"));
-    	for(int i = 0; i < 100; i++	){
-    		resultsContainer.add(new JLabel("Hotel " + i));
-    		resultsContainer.add(new JLabel("Address " + i));
-    		resultsContainer.add(new JLabel("Stars " + i));
-    		resultsContainer.add(new JLabel("Room # " + i));
-    		resultsContainer.add(new JLabel("Available " + i));
-    		resultsContainer.add(new JLabel("Type " + i));
-    		resultsContainer.add(new JButton("Reserve this room"));
-    	}
+    	titles.add(new JLabel());
+    	
+    	showHotel(); //current used just for display, later remove and showhotel will be called when query inputs from user are given
+    	
     	this.add(titles, BorderLayout.NORTH);
     	this.add(new JScrollPane(resultsContainer), BorderLayout.CENTER);
     	/*
