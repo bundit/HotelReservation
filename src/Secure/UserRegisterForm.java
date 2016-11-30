@@ -116,7 +116,7 @@ public class UserRegisterForm extends javax.swing.JFrame {
 
     private void btn_submitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_submitActionPerformed
         // TODO add your handling code here:
-        conn = MySqlConnection.ConnectDB();
+        //conn = MySqlConnection.ConnectDB();
         
         String name = txt_name.getText();
         String email = txt_email.getText();

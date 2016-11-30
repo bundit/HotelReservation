@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Secure;
 import java.sql.*;
 import javax.swing.*;
@@ -12,9 +8,9 @@ import javax.swing.*;
  * @author Roya, Bundit, Zur
  */
 public class MySqlConnection {
-	private final String DB = "jdbc:mysql://localhost/HotelReservation";
+	private final String DB = "jdbc:mysql://localhost:3306/HotelReservation";
 	private final String DB_USER = "root"; //username for database 
-	private final String DB_PASSWORD = "enter your password here"; //password for database
+	private final String DB_PASSWORD = "Jongsuwan123123"; //password for database
 
 	MySqlConnection(){
 
@@ -26,18 +22,18 @@ public class MySqlConnection {
 	 * @param password the password inputted into the passwordfield on login page
 	 * @return true if login credentials are correct, false if not
 	 */
-	boolean loginGuest(String username, String password) {
+	boolean loginGuest(String userEmail, String password) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		boolean valid = false;
 		String sql = "SELECT *\n"
 				+ "FROM guest\n"
-				+ "WHERE username=? and password=?";
+				+ "WHERE email=? and password=?";
 		try {
 			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
 			ps = conn.prepareStatement(sql);
-			ps.setString(1,username);
+			ps.setString(1,userEmail);
 			ps.setString(2,password);
 			rs = ps.executeQuery();
 
@@ -93,10 +89,37 @@ public class MySqlConnection {
 		}
 	}
 
+	/**
+	 * Cancels a guest's reservation by their reservation number
+	 * @param reservationNum
+	 */
 	void cancelReservation(int reservationNum) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		//ResultSet rs = null;
 
+		String sql = "DElETE\n"
+				+ "FROM reservation\n"
+				+ "WhERE reserve_id = ?";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			ps = conn.prepareStatement(sql);
+			ps.setString(1,"" +reservationNum);
+			ps.execute();
+
+			JOptionPane.showMessageDialog(null,"Reservation " + reservationNum + " Canceled");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+		}
 	}
 
+	/**
+	 * Displays a guest's reservation by their reservation number
+	 * @param reservationNum
+	 */
 	void viewReservation(int reservationNum) {
 
 	}

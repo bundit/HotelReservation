@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Secure;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -40,7 +35,7 @@ public class GuestLogin extends JFrame {
     	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     	this.setLayout(new GridLayout(0,4));
     	
-        jLabel1 = new JLabel("Username");
+        jLabel1 = new JLabel("User Email");
         jLabel2 = new JLabel("Password");
         txtusername = new javax.swing.JTextField();
         txtpassword = new javax.swing.JPasswordField();
@@ -52,27 +47,27 @@ public class GuestLogin extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new CreateAccount(database, GuestLogin.this);
+				GuestLogin.this.setVisible(false);
 			}
-        	
         });
         
-        for(int i = 0; i < 9; i++){
+        for(int i = 0; i < 9; i++){ //whitespace
         	this.add(new JPanel());
         }
         this.add(jLabel1);
         this.add(txtusername);
-        for(int i = 0; i < 6; i++){
+        for(int i = 0; i < 6; i++){ //whitespace
         	this.add(new JPanel());
         }
         this.add(jLabel2);
         this.add(txtpassword);
-        for(int i = 0; i < 6; i++){
+        for(int i = 0; i < 6; i++){ //whitespace
         	this.add(new JPanel());
         }
         this.add(btnSubmit);
         this.add(btnNewGuest);
         
-        for(int i = 0; i < 8; i++){
+        for(int i = 0; i < 8; i++){ //whitespace
         	this.add(new JPanel());
         }
        
@@ -89,9 +84,8 @@ public class GuestLogin extends JFrame {
 				boolean valid = database.loginGuest(txtusername.getText(), new String(txtpassword.getPassword()));
 		    	if(valid) {
 		    		JOptionPane.showMessageDialog(null,"Welcome user");
-		    		
-		            GuestLogin.this.setVisible(false);
 		            new MainFrame(database).setVisible(true);
+		    
 		    	} else {
 		    		JOptionPane.showMessageDialog(null,"invalid username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
 		    	}
@@ -126,7 +120,7 @@ public class GuestLogin extends JFrame {
             java.util.logging.Logger.getLogger(GuestLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
-        /* Create and display the form */
+        /* Create and display sthe form */
         MySqlConnection sqlcon = new MySqlConnection(); //create the model and pass it to the view/controller
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {

@@ -39,7 +39,7 @@ public class CreateAccount extends JFrame{
     	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     	this.setLayout(new GridLayout(0,4));
     	
-        user = new JLabel("Username");
+        user = new JLabel("Name");
         password = new JLabel("Password");
         email = new JLabel("Email");
         txtusername = new JTextField();
@@ -49,9 +49,26 @@ public class CreateAccount extends JFrame{
 
         submit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                mysql.addNewGuest(txtusername.getText(), new String(txtpassword.getPassword()), txtemail.getText());
-                CreateAccount.this.gl.setVisible(true);
-                CreateAccount.this.dispose();
+            	String uName = txtusername.getText();
+            	String uPass = new String(txtpassword.getPassword());
+            	String uEmail = txtemail.getText();
+            
+            	if(uName.isEmpty() || uPass.isEmpty() || uEmail.isEmpty()) {
+            		JOptionPane.showMessageDialog(null, "Name, email, or password cannot be empty");
+            		return;
+            	}
+            	
+            	boolean valid = mysql.loginGuest(uEmail, uPass);
+            	if(!valid) {
+            		mysql.addNewGuest(uName, uPass, uEmail);
+            		CreateAccount.this.gl.setVisible(true);
+                    CreateAccount.this.dispose();
+            	} else {
+            		JOptionPane.showMessageDialog(null, "User email already exists, try a different one.");
+            		CreateAccount.this.txtemail.setText("");
+            		return;
+            	}
+                
           
             }
         });        
