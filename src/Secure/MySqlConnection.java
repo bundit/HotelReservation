@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 public class MySqlConnection {
 	private final String DB = "jdbc:mysql://localhost:3306/HotelReservation";
 	private final String DB_USER = "root"; //username for database 
-	private final String DB_PASSWORD = "Jongsuwan123123"; //password for database
+	private final String DB_PASSWORD = "your password goes here"; //password for database
 
 	MySqlConnection(){
 
