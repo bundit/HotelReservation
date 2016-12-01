@@ -5,10 +5,15 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+
 
 import javax.swing.*;
 
 public class MainFrame extends JFrame{
+	private static final long serialVersionUID = 1L;
 	private MySqlConnection sql;
 
 	public MainFrame(MySqlConnection sql) {
@@ -75,42 +80,63 @@ public class MainFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				JPanel info = new JPanel();
 				info.setLayout(new GridLayout(0,2));
+				
+				ArrayList<String> hotelNames = sql.getListOfDetails("hotel", "name");
 				JComboBox<String> hotels = new JComboBox<>();
 				hotels.addItem("All Hotels");
-				hotels.addItem("Hilton");
+				for(int i = 0; i < hotelNames.size(); i++) {
+					hotels.addItem(hotelNames.get(i));
+				}
 				
+				ArrayList<String> cityNames = sql.getListOfDetails("hotel","address");
 				JComboBox<String> cities = new JComboBox<>();
 				cities.addItem("All Cities");
-				cities.addItem("San Francisco");
-				cities.addItem("San Jose");
-				cities.addItem("Santa Cruz");
+				for(int i = 0; i < cityNames.size(); i++) {
+					cities.addItem(cityNames.get(i));
+				}
 				
+				ArrayList<String> typesList = sql.getListOfDetails("room", "type");
 				JComboBox<String> types = new JComboBox<>();
 				types.addItem("Any Type");
-				types.addItem("Standard");
-				types.addItem("Suite");
+				for(int i = 0; i < typesList.size(); i++) {
+					types.addItem(typesList.get(i));
+				}
 				
-				JComboBox<Object> ratings = new JComboBox<>();
+				JComboBox<String> ratings = new JComboBox<>();
 				ratings.addItem("Any Rating");
-				ratings.addItem(1);
-				ratings.addItem(2);
-				ratings.addItem(3);
-				ratings.addItem(4);
-				ratings.addItem(5);
+				ratings.addItem("1");
+				ratings.addItem("2");
+				ratings.addItem("3");
+				ratings.addItem("4");
+				ratings.addItem("5");
 				
-				JComboBox<Object> capacity = new JComboBox<>();
+				JComboBox<String> capacity = new JComboBox<>();
 				capacity.addItem("Any Capacity");
 				capacity.addItem("1-2");
 				capacity.addItem("3-4");
 				capacity.addItem("5-6");
 				
-				JComboBox<Object> prices = new JComboBox<>();
+				JComboBox<String> prices = new JComboBox<>();
 				prices.addItem("Any Price");
 				prices.addItem("50");
 				prices.addItem("100");
 				prices.addItem("150");
 				prices.addItem("200");
 				
+				info.add(new JPanel());
+				info.add(new JPanel());
+				info.add(new JLabel("Check In"));
+				SpinnerDateModel spinModelIn = new SpinnerDateModel();
+			    JSpinner dayin = new JSpinner(spinModelIn);
+				dayin.setEditor(new JSpinner.DateEditor(dayin,"dd/MM/yyyy"));
+				info.add(dayin);
+				info.add(new JPanel());
+				info.add(new JPanel());
+				info.add(new JLabel("Check Out"));
+				SpinnerDateModel spinModelOut = new SpinnerDateModel();
+			    JSpinner dayout = new JSpinner(spinModelOut);
+				dayout.setEditor(new JSpinner.DateEditor(dayout,"dd/MM/yyyy"));
+				info.add(dayout);
 				info.add(new JPanel());
 				info.add(new JPanel());
 				info.add(new JLabel("Hotels"));
@@ -133,7 +159,7 @@ public class MainFrame extends JFrame{
 				info.add(capacity);
 				info.add(new JPanel());
 				info.add(new JPanel());
-				info.add(new JLabel("Minimum Price"));
+				info.add(new JLabel("Maximum Price"));
 				info.add(prices);
 				info.add(new JPanel());
 				info.add(new JPanel());
@@ -143,8 +169,14 @@ public class MainFrame extends JFrame{
 				//get info from comboboxes
 				
 				//do stuff
+				 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+				 
+				 String dIn = dateFormat.format(dayin.getValue());
+				 String dOut = dateFormat.format(dayin.getValue());
+				 
+				 
 				
-				new HotelInfo(sql).showHotel();
+				new HotelInfo(sql).showHotel(dIn, dOut, hotels.getSelectedItem().toString(), cities.getSelectedItem().toString(), types.getSelectedItem().toString(), ratings.getSelectedItem().toString(), capacity.getSelectedItem().toString(), prices.getSelectedItem().toString());
 			}
 		};
 	}
@@ -159,21 +191,19 @@ public class MainFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				String uInput = JOptionPane.showInputDialog(null,"Input your reservation number to cancel");
 				
+				if(uInput == null || uInput.isEmpty()) {
+					return;
+				}
 				//input length must be less than 11 digits
 				if(uInput.length() > 10) {
 					JOptionPane.showMessageDialog(null, "Reservation Number does not exist");
 					actionPerformed(e);
 					return;
-				}
-				
-				//check user input
-				if(uInput == null || uInput.isEmpty()) {
-					return;
-				} else {
+				} else { //check user input
 					for (int i = 0; i < uInput.length(); i++) {
 						if (!Character.isDigit(uInput.charAt(i))){
 							JOptionPane.showMessageDialog(null, "Please enter digits only");
-							actionPerformed(e);
+							//actionPerformed(e);
 							return;
 						}
 					}
@@ -197,11 +227,17 @@ public class MainFrame extends JFrame{
 				//check user input
 				if(uInput == null || uInput.isEmpty()) {
 					return;
+				} 
+				
+				if(uInput.length() > 10) {
+					JOptionPane.showMessageDialog(null, "Reservation Number does not exist");
+					actionPerformed(e);
+					return;
 				} else {
 					for (int i = 0; i < uInput.length(); i++) {
 						if (!Character.isDigit(uInput.charAt(i))){
 							JOptionPane.showMessageDialog(null, "Please enter digits only");
-							actionPerformed(e);
+							//actionPerformed(e);
 							return;
 						}
 					}

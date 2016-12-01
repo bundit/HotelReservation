@@ -1,7 +1,9 @@
 
 package Secure;
 import java.sql.*;
-import javax.swing.*;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -57,6 +59,42 @@ public class MySqlConnection {
 			return false;
 		}
 	}
+	
+	/**
+	 * Gets a list of distinct items from the table specified
+	 * @param table the table to retrieve from 
+	 * @param attribute the column to return
+	 * @return
+	 */
+	ArrayList<String> getListOfDetails(String table,String attribute) {
+		Connection conn = null;
+		Statement ps = null;
+		ResultSet rs = null;
+		ArrayList<String> distinctListofItems = new ArrayList<>();
+
+		String sql = "SELECT DISTINCT " + attribute + "\n"
+				+ "FROM " + table + "\n"
+				+ "ORDER BY " + attribute;
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			ps = conn.createStatement();
+			
+			rs = ps.executeQuery(sql);
+			
+			while(rs.next()) {
+				
+				distinctListofItems.add(rs.getString(attribute));	
+			}
+			
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+		}
+		return distinctListofItems;
+	}
+	
 
 	/**
 	 * Adds a new guest user to the database
@@ -98,7 +136,7 @@ public class MySqlConnection {
 		PreparedStatement ps = null;
 		//ResultSet rs = null;
 
-		String sql = "DElETE\n"
+		String sql = "DELETE\n"
 				+ "FROM reservation\n"
 				+ "WhERE reserve_id = ?";
 		try {
@@ -121,7 +159,122 @@ public class MySqlConnection {
 	 * @param reservationNum
 	 */
 	void viewReservation(int reservationNum) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		String sql = "SELECT *\n"
+				+ "FROM reservation,guest,hotel\n"
+				+ "WHERE reservation.guest_id = guest.guest_id\n" 
+				+ "and reservation.hotel_id = hotel.hotel_id\n"
+				+ "and reserve_id=?";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			ps = conn.prepareStatement(sql);
+			ps.setString(1,"" + reservationNum);
+			
+			rs = ps.executeQuery();
 
+			if(rs.next()) {
+				JOptionPane.showMessageDialog(null, "\nReservation Number: " + reservationNum + " for " + rs.getString("username") + "\n"
+						+ "Check In Date: " + rs.getString("checkindate") + "\n" 
+						+ "Check Out Date: " + rs.getString("checkoutdate") + "\n" 
+						+ "Hotel: " + rs.getString("name") + "\nRoom Number: " + rs.getString("room_id") + "\n"
+						+ "\nTotal Cost: " + rs.getString("totalCost"));
+			} else {
+				JOptionPane.showMessageDialog(null, "Reservation " + reservationNum + " does not exist");
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+			System.out.println("Not correctly working");
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+			try{if(rs != null) rs.close();} catch (Exception e){}
+		}
+	}
+	ArrayList<String> getHotelInfoForGuest(String dateIn, String dateOut, String hotelName, 
+		String locations, String roomType, String minimumStars, String capacity, String maxPrice){
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<String> toReturn = new ArrayList<>();
+		
+		String sql = "SELECT name, address, type, star, capacity, price\n"
+					+ "FROM room JOIN hotel ON room.hotel_id = hotel.hotel_id\n"
+					+ "WHERE room_id NOT IN (select r1.room_id\n"
+					+ "FROM room AS r1 JOIN reservation AS r2 ON r1.room_id = r2.room_id\n"
+					+ "WHERE checkindate >= ?\n"
+					+ "AND checkoutdate < ?\n)"
+					+ "AND hotel.name = ?\n"
+					+ "AND hotel.address = ?\n"
+					+ "AND room.type = ?\n"
+					+ "AND hotel.star >= ?\n"
+					+ "AND room.capacity = ?\n"
+					+ "AND room.price <= ?\n";
+		
+		if(hotelName.equals("All Hotels")) {
+			hotelName = "hotel.name";
+		}
+		if(locations.equals("All Cities")) {
+			locations = "hotel.address";
+		}
+		if(roomType.equals("Any Type")) {
+			roomType = "room.type";
+		}
+		if(minimumStars.equals("Any Rating")) {
+			minimumStars = "hotel.star";
+		}
+		if(capacity.equals("Any Capacity")) {
+			capacity = "room.capacity";
+		}
+		if(maxPrice.equals("Any Price")) {
+			maxPrice = "room.price";
+		}			
+					
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			
+			System.out.println(dateIn);
+			System.out.println(dateOut);
+			System.out.println(hotelName);
+			System.out.println(locations);
+			System.out.println(roomType);
+			System.out.println(minimumStars);
+			System.out.println(capacity);
+			System.out.println(maxPrice);
+			
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, dateIn);
+			ps.setString(2, dateOut);
+			ps.setString(3, hotelName);
+			ps.setString(4, locations);
+			ps.setString(5, roomType);
+			ps.setString(6, minimumStars);
+			ps.setString(7, capacity);
+			ps.setString(8, maxPrice);
+			
+			rs = ps.executeQuery();
+
+			while(rs.next()) {
+				System.out.println("MYSQL");
+				toReturn.add(rs.getString("name"));
+				toReturn.add(rs.getString("address"));
+				toReturn.add(rs.getString("type"));
+				toReturn.add(rs.getString("star"));
+				toReturn.add(rs.getString("capacity"));
+				toReturn.add(rs.getString("price"));
+			}
+			
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+			System.out.println("Not correctly working");
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+			try{if(rs != null) rs.close();} catch (Exception e){}
+		}
+		return toReturn;
 	}
 }
 

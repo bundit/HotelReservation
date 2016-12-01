@@ -9,7 +9,8 @@ import javax.swing.*;
  * @author Roya
  */
 public class GuestLogin extends JFrame {
-    private MySqlConnection database;
+	private static final long serialVersionUID = 1L;
+	private MySqlConnection database;
     private javax.swing.JButton btnSubmit;
     private javax.swing.JButton btnNewGuest;
     private javax.swing.JLabel jLabel1;
@@ -54,6 +55,8 @@ public class GuestLogin extends JFrame {
         for(int i = 0; i < 9; i++){ //whitespace
         	this.add(new JPanel());
         }
+        
+        
         this.add(jLabel1);
         this.add(txtusername);
         for(int i = 0; i < 6; i++){ //whitespace
@@ -84,13 +87,13 @@ public class GuestLogin extends JFrame {
 				boolean valid = database.loginGuest(txtusername.getText(), new String(txtpassword.getPassword()));
 		    	if(valid) {
 		    		JOptionPane.showMessageDialog(null,"Welcome user");
+		    		GuestLogin.this.dispose();
 		            new MainFrame(database).setVisible(true);
 		    
 		    	} else {
 		    		JOptionPane.showMessageDialog(null,"invalid username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
 		    	}
 			}
-    		
     	};
     }
  

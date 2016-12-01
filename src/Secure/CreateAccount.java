@@ -12,6 +12,7 @@ import javax.swing.*;
  *
  */
 public class CreateAccount extends JFrame{
+	private static final long serialVersionUID = 1L;
 	private MySqlConnection mysql;
 	private JButton submit;
 	private JLabel user;
