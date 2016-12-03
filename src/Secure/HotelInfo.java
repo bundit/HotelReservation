@@ -3,6 +3,8 @@ package Secure;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -33,16 +35,35 @@ public class HotelInfo extends javax.swing.JFrame {
     void showHotel(String dateIn, String dateOut, String hotelName, String locations, String roomType, String minimumStars, String capacity, String minimumPrice){
     	
     	ArrayList<String> rs = sql.getHotelInfoForGuest(dateIn, dateOut, hotelName, locations, roomType, minimumStars, capacity, minimumPrice);
-    	
-    		for(int i = 0; i < rs.size(); i = i + 6) {
-   
-    			resultsContainer.add(new JLabel(rs.get(i)));
-    			resultsContainer.add(new JLabel(rs.get(i + 1)));
-    			resultsContainer.add(new JLabel(rs.get(i + 2)));
-    			resultsContainer.add(new JLabel(rs.get(i + 3)));
-    			resultsContainer.add(new JLabel(rs.get(i + 4)));
-    			resultsContainer.add(new JLabel(rs.get(i + 5)));
-    			resultsContainer.add(new JButton("Reserve this room"));
+    	int guestID = sql.getGuest_Id();
+    		for(int i = 0; i < rs.size(); i = i + 8) {
+    			
+    			String hotel = rs.get(i);
+    			String city = rs.get(i+1);
+    			String type = rs.get(i+2);
+    			String stars = rs.get(i+3);
+    			String size = rs.get(i+4);
+    			String price = rs.get(i+5);
+    			String roomID = rs.get(i+6);
+    			String hotelID = rs.get(i+7);
+
+    			
+    			resultsContainer.add(new JLabel(hotel));
+    			resultsContainer.add(new JLabel(city));
+    			resultsContainer.add(new JLabel(type));
+    			resultsContainer.add(new JLabel(stars));
+    			resultsContainer.add(new JLabel(size));
+    			resultsContainer.add(new JLabel(price + ""));
+    			
+    			JButton btnReserve = new JButton("Reserve this room");
+    			btnReserve.addActionListener(new ActionListener(){
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						HotelInfo.this.sql.createNewReservation(roomID, hotelID, guestID, dateIn, dateOut, price);
+					}
+    				
+    			});
+    			resultsContainer.add(btnReserve);
     		}
     			
         setVisible(true);

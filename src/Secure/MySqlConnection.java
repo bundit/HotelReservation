@@ -13,7 +13,9 @@ public class MySqlConnection {
 	private final String DB = "jdbc:mysql://localhost:3306/HotelReservation";
 	private final String DB_USER = "root"; //username for database 
 	private final String DB_PASSWORD = "Jongsuwan123123"; //password for database
-
+	private int guest_id;
+	private int admin_id;
+	
 	MySqlConnection(){
 
 	}
@@ -40,6 +42,7 @@ public class MySqlConnection {
 			rs = ps.executeQuery();
 
 			if(rs.next()) {
+				guest_id = rs.getInt("guest_id");
 				valid = true;
 			} else {
 				valid = false;
@@ -96,6 +99,14 @@ public class MySqlConnection {
 		} 
 		return false;
 	}
+	
+	int getGuest_Id(){
+		return guest_id;
+	}
+	int getAdmin_Id(){
+		return admin_id;
+	}
+	
 	/**
 	 * Gets a list of distinct items from the table specified
 	 * @param table the table to retrieve from 
@@ -207,7 +218,7 @@ public class MySqlConnection {
 		try {
 			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
 			ps = conn.prepareStatement(sql);
-			ps.setString(1,"" + reservationNum);
+			ps.setInt(1,reservationNum);
 			
 			rs = ps.executeQuery();
 
@@ -236,12 +247,12 @@ public class MySqlConnection {
 		ResultSet rs = null;
 		ArrayList<String> toReturn = new ArrayList<>();
 		
-		String sql = "SELECT name, address, type, star, capacity, price\n"
+		String sql = "SELECT name, address, type, star, capacity, price, room_id, hotel.hotel_id\n"
 					+ "FROM room JOIN hotel ON room.hotel_id = hotel.hotel_id\n"
 					+ "WHERE room_id NOT IN (select r2.room_id\n"
 					+ "FROM room AS r1 JOIN reservation AS r2 ON r1.room_id = r2.room_id\n"
-					+ "WHERE checkindate >= ?\n"
-					+ "AND checkoutdate < ?)\n";
+					+ "WHERE (checkindate < ? AND checkindate <= ?)\n"
+					+ "OR (checkoutdate >= ? AND checkoutdate > ?))\n";
 //					+ "AND hotel.name = ?\n"
 //					+ "AND hotel.address = ?\n"
 //					+ "AND room.type = ?\n"
@@ -270,7 +281,9 @@ public class MySqlConnection {
 	
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, dateIn);
-			ps.setString(2, dateOut);
+			ps.setString(2, dateIn);
+			ps.setString(3, dateOut);
+			ps.setString(4, dateOut);
 //			ps.setString(3, hotelName);
 //			ps.setString(4, locations);
 //			ps.setString(5, roomType);
@@ -287,7 +300,8 @@ public class MySqlConnection {
 				toReturn.add(rs.getString("star"));
 				toReturn.add(rs.getString("capacity"));
 				toReturn.add(rs.getString("price"));
-				
+				toReturn.add(rs.getString("room_id"));
+				toReturn.add(rs.getString("hotel_id"));
 
 			}
 			
@@ -300,6 +314,33 @@ public class MySqlConnection {
 			try{if(rs != null) rs.close();} catch (Exception e){}
 		}
 		return toReturn;
+	}
+
+	void createNewReservation(String roomID, String hotelID, int guestID,String checkIn, String checkOut, String cost) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		
+		String sql = "INSERT INTO reservation\n"
+				+ "VALUES(null, ?, ?, ?, ?, ?, ?)";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			ps = conn.prepareStatement(sql);
+			ps.setString(1,roomID);
+			ps.setString(2,hotelID);
+			ps.setInt(3,guestID);
+			ps.setString(4,checkIn);
+			ps.setString(5,checkOut);
+			ps.setString(6,cost);
+			System.out.println("create new reservation");
+			
+			ps.executeUpdate();
+
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+		}
 	}
 
 	
