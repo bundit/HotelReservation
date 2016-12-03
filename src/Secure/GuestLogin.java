@@ -2,7 +2,15 @@ package Secure;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 /**
  *
@@ -11,12 +19,14 @@ import javax.swing.*;
 public class GuestLogin extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private MySqlConnection database;
-    private javax.swing.JButton btnSubmit;
-    private javax.swing.JButton btnNewGuest;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPasswordField txtpassword;
-    private javax.swing.JTextField txtusername;
+    private JButton btnSubmit;
+    private JButton btnNewGuest;
+    private JLabel jLabel1;
+    private JLabel jLabel2;
+    private JPasswordField txtpassword;
+    private JTextField txtusername;
+    private JCheckBox ckboxAdmin;
+    private boolean check;
 
     /**
      * Creates new form GuestLogin
@@ -38,11 +48,22 @@ public class GuestLogin extends JFrame {
     	
         jLabel1 = new JLabel("User Email");
         jLabel2 = new JLabel("Password");
-        txtusername = new javax.swing.JTextField();
-        txtpassword = new javax.swing.JPasswordField();
+        txtusername = new JTextField();
+        txtpassword = new JPasswordField();
+        JCheckBox ckboxAdmin = new JCheckBox("Admin login");
         btnSubmit = new JButton("Submit");
         btnNewGuest = new JButton("New Guest");
+        check = false;
 
+        ckboxAdmin.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(check) check = false;
+				else
+					check = true;
+			}
+        	
+        });
         btnSubmit.addActionListener(getBtnSubmitAction());
         btnNewGuest.addActionListener(new ActionListener(){
 			@Override
@@ -64,7 +85,14 @@ public class GuestLogin extends JFrame {
         }
         this.add(jLabel2);
         this.add(txtpassword);
+        for(int i = 0; i < 3; i++){ //whitespace
+        	this.add(new JPanel());
+        }
+        
+        this.add(ckboxAdmin);
+        
         for(int i = 0; i < 6; i++){ //whitespace
+        	
         	this.add(new JPanel());
         }
         this.add(btnSubmit);
@@ -84,15 +112,25 @@ public class GuestLogin extends JFrame {
     	return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				boolean valid = database.loginGuest(txtusername.getText(), new String(txtpassword.getPassword()));
-		    	if(valid) {
-		    		JOptionPane.showMessageDialog(null,"Welcome user");
-		    		GuestLogin.this.dispose();
-		            new MainFrame(database).setVisible(true);
-		    
-		    	} else {
-		    		JOptionPane.showMessageDialog(null,"invalid username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
-		    	}
+				if(check) {
+					boolean valid = database.loginAdmin(txtusername.getText(),new String(txtpassword.getPassword()));
+					if(valid) {
+						JOptionPane.showMessageDialog(null,"Welcome admin");
+			    		GuestLogin.this.dispose();
+			    		
+					} else {
+						JOptionPane.showMessageDialog(null,"Invalid admin username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					boolean valid = database.loginGuest(txtusername.getText(), new String(txtpassword.getPassword()));
+			    	if(valid) {
+			    		JOptionPane.showMessageDialog(null,"Welcome user");
+			    		GuestLogin.this.dispose();
+			            new MainFrame(database).setVisible(true);
+			    	} else {
+			    		JOptionPane.showMessageDialog(null,"Invalid guest username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
+			    	}
+				}
 			}
     	};
     }

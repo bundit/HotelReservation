@@ -35,7 +35,8 @@ public class MainFrame extends JFrame{
 		btnLogout.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.exit(0);
+				MainFrame.this.dispose();
+				new GuestLogin(MainFrame.this.sql);
 			}
 		});
 		title.add(btnLogout, BorderLayout.EAST);
@@ -165,18 +166,20 @@ public class MainFrame extends JFrame{
 				info.add(new JPanel());
 				
 				JOptionPane.showConfirmDialog(null, info, "Find Hotel Rooms", JOptionPane.OK_CANCEL_OPTION);
-				//this methods needs to get the input from user then show the results in a new instance of HotelInfo
-				//get info from comboboxes
 				
-				//do stuff
-				 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+				 DateFormat dateFormat = new SimpleDateFormat("yyyy-dd-MM");
 				 
 				 String dIn = dateFormat.format(dayin.getValue());
-				 String dOut = dateFormat.format(dayin.getValue());
+				 String dOut = dateFormat.format(dayout.getValue());
 				 
-				 
+				 String hotelStr = hotels.getSelectedItem().toString();
+				 String cityStr = cities.getSelectedItem().toString();
+				 String typeStr = types.getSelectedItem().toString();
+				 String ratingStr = ratings.getSelectedItem().toString();
+				 String capacityStr = capacity.getSelectedItem().toString();
+				 String priceStr = prices.getSelectedItem().toString();
 				
-				new HotelInfo(sql).showHotel(dIn, dOut, hotels.getSelectedItem().toString(), cities.getSelectedItem().toString(), types.getSelectedItem().toString(), ratings.getSelectedItem().toString(), capacity.getSelectedItem().toString(), prices.getSelectedItem().toString());
+				new HotelInfo(sql).showHotel(dIn, dOut, hotelStr, cityStr, typeStr, ratingStr, capacityStr, priceStr);
 			}
 		};
 	}

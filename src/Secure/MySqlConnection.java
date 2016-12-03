@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 public class MySqlConnection {
 	private final String DB = "jdbc:mysql://localhost:3306/HotelReservation";
 	private final String DB_USER = "root"; //username for database 
-	private final String DB_PASSWORD = "your password goes here"; //password for database
+	private final String DB_PASSWORD = "Jongsuwan123123"; //password for database
 
 	MySqlConnection(){
 
@@ -51,15 +51,51 @@ public class MySqlConnection {
 			try{if(conn != null) conn.close();} catch (Exception e){}
 			try{if(ps != null) ps.close();} catch (Exception e){}
 			try{if(rs != null) rs.close();} catch (Exception e){}
-
 		}
 		if (valid) {
 			return true;
-		} else {
-			return false;
-		}
+		} 
+		return false;
 	}
-	
+	/**
+	 * Returns true if the admin tuple exists in the admin table 
+	 * @param username the user's login name inputted in the username textfield on login page
+	 * @param password the password inputted into the passwordfield on login page
+	 * @return true if login credentials are correct, false if not
+	 */
+	boolean loginAdmin(String user, String pass) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean valid = false;
+		String sql = "SELECT *\n"
+				+ "FROM admin\n"
+				+ "WHERE email=? and password=?";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			ps = conn.prepareStatement(sql);
+			ps.setString(1,user);
+			ps.setString(2,pass);
+			rs = ps.executeQuery();
+
+			if(rs.next()) {
+				valid = true;
+			} else {
+				valid = false;
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+			System.out.println("Not correctly working");
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+			try{if(rs != null) rs.close();} catch (Exception e){}
+		}
+		if (valid) {
+			return true;
+		} 
+		return false;
+	}
 	/**
 	 * Gets a list of distinct items from the table specified
 	 * @param table the table to retrieve from 
@@ -202,68 +238,57 @@ public class MySqlConnection {
 		
 		String sql = "SELECT name, address, type, star, capacity, price\n"
 					+ "FROM room JOIN hotel ON room.hotel_id = hotel.hotel_id\n"
-					+ "WHERE room_id NOT IN (select r1.room_id\n"
+					+ "WHERE room_id NOT IN (select r2.room_id\n"
 					+ "FROM room AS r1 JOIN reservation AS r2 ON r1.room_id = r2.room_id\n"
 					+ "WHERE checkindate >= ?\n"
-					+ "AND checkoutdate < ?\n)"
-					+ "AND hotel.name = ?\n"
-					+ "AND hotel.address = ?\n"
-					+ "AND room.type = ?\n"
-					+ "AND hotel.star >= ?\n"
-					+ "AND room.capacity = ?\n"
-					+ "AND room.price <= ?\n";
+					+ "AND checkoutdate < ?)\n";
+//					+ "AND hotel.name = ?\n"
+//					+ "AND hotel.address = ?\n"
+//					+ "AND room.type = ?\n"
+//					+ "AND hotel.star >= ?\n"
+//					+ "AND room.capacity = ?\n"
+//					+ "AND room.price <= ?\n";
 		
-		if(hotelName.equals("All Hotels")) {
-			hotelName = "hotel.name";
-		}
-		if(locations.equals("All Cities")) {
-			locations = "hotel.address";
-		}
-		if(roomType.equals("Any Type")) {
-			roomType = "room.type";
-		}
-		if(minimumStars.equals("Any Rating")) {
-			minimumStars = "hotel.star";
-		}
-		if(capacity.equals("Any Capacity")) {
-			capacity = "room.capacity";
-		}
-		if(maxPrice.equals("Any Price")) {
-			maxPrice = "room.price";
-		}			
+
+		
+		if(!hotelName.equals("All Hotels")) sql += "AND hotel.name = '" + hotelName + "'\n";//hotelName = "hotel.name";
+			
+		if(!locations.equals("All Cities")) sql += "AND hotel.address = '" + locations + "'\n";//locations = "address";
+		
+		if(!roomType.equals("Any Type")) sql += "AND room.type = '" + roomType + "'\n";//roomType = "type";
+		
+		if(!minimumStars.equals("Any Rating")) sql += "AND hotel.star >= '" + minimumStars + "'\n";//minimumStars = "star";
+		
+		if(!capacity.equals("Any Capacity")) sql += "AND room.capacity = '" + capacity + "'\n";//capacity = "capacity";
+		
+		if(!maxPrice.equals("Any Price")) sql += "AND room.price <= '" + maxPrice + "'\n";//maxPrice = "price";		
 					
+		
+		
 		try {
 			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
-			
-			System.out.println(dateIn);
-			System.out.println(dateOut);
-			System.out.println(hotelName);
-			System.out.println(locations);
-			System.out.println(roomType);
-			System.out.println(minimumStars);
-			System.out.println(capacity);
-			System.out.println(maxPrice);
-			
+	
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, dateIn);
 			ps.setString(2, dateOut);
-			ps.setString(3, hotelName);
-			ps.setString(4, locations);
-			ps.setString(5, roomType);
-			ps.setString(6, minimumStars);
-			ps.setString(7, capacity);
-			ps.setString(8, maxPrice);
+//			ps.setString(3, hotelName);
+//			ps.setString(4, locations);
+//			ps.setString(5, roomType);
+//			ps.setString(6, minimumStars);
+//			ps.setString(7, capacity);
+//			ps.setString(8, maxPrice);
 			
 			rs = ps.executeQuery();
 
 			while(rs.next()) {
-				System.out.println("MYSQL");
 				toReturn.add(rs.getString("name"));
 				toReturn.add(rs.getString("address"));
 				toReturn.add(rs.getString("type"));
 				toReturn.add(rs.getString("star"));
 				toReturn.add(rs.getString("capacity"));
 				toReturn.add(rs.getString("price"));
+				
+
 			}
 			
 		} catch (Exception e) {
@@ -276,5 +301,7 @@ public class MySqlConnection {
 		}
 		return toReturn;
 	}
+
+	
 }
 
