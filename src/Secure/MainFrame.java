@@ -29,14 +29,14 @@ public class MainFrame extends JFrame{
 
 		JPanel mainPanel = new JPanel();
 
-		JPanel title = new JPanel(new GridLayout(0,2));
+		JPanel title = new JPanel();
 		title.add(new JLabel("<html><font size=\"+3\"><b>Main Menu\t</b></font></html>"),BorderLayout.WEST);
 		JButton btnLogout = new JButton("Logout");
 		btnLogout.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				new GuestLogin(MainFrame.this.sql).setVisible(true);;
 				MainFrame.this.dispose();
-				new GuestLogin(MainFrame.this.sql);
 			}
 		});
 		title.add(btnLogout, BorderLayout.EAST);
@@ -105,11 +105,14 @@ public class MainFrame extends JFrame{
 				
 				JComboBox<String> ratings = new JComboBox<>();
 				ratings.addItem("Any Rating");
-				ratings.addItem("1");
-				ratings.addItem("2");
-				ratings.addItem("3");
-				ratings.addItem("4");
-				ratings.addItem("5");
+				for(int i = 1; i < 6; i++) {
+					ratings.addItem(i + "");
+				}
+//				ratings.addItem("1");
+//				ratings.addItem("2");
+//				ratings.addItem("3");
+//				ratings.addItem("4");
+//				ratings.addItem("5");
 				
 				JComboBox<String> capacity = new JComboBox<>();
 				capacity.addItem("Any Capacity");
@@ -123,6 +126,15 @@ public class MainFrame extends JFrame{
 				prices.addItem("100");
 				prices.addItem("150");
 				prices.addItem("200");
+				
+				JComboBox<String> orderBy = new JComboBox<>();
+				orderBy.addItem("Any Order");
+				orderBy.addItem("Name");
+				orderBy.addItem("Address");
+				orderBy.addItem("Type");
+				orderBy.addItem("Star");
+				orderBy.addItem("Capacity");
+				orderBy.addItem("Price");
 				
 				info.add(new JPanel());
 				info.add(new JPanel());
@@ -164,6 +176,10 @@ public class MainFrame extends JFrame{
 				info.add(prices);
 				info.add(new JPanel());
 				info.add(new JPanel());
+				info.add(new JLabel("Sort By"));
+				info.add(orderBy);
+				info.add(new JPanel());
+				info.add(new JPanel());
 				
 				JOptionPane.showConfirmDialog(null, info, "Find Hotel Rooms", JOptionPane.OK_CANCEL_OPTION);
 				
@@ -178,8 +194,9 @@ public class MainFrame extends JFrame{
 				 String ratingStr = ratings.getSelectedItem().toString();
 				 String capacityStr = capacity.getSelectedItem().toString();
 				 String priceStr = prices.getSelectedItem().toString();
+				 String order = orderBy.getSelectedItem().toString();
 				
-				new HotelInfo(sql).showHotel(dIn, dOut, hotelStr, cityStr, typeStr, ratingStr, capacityStr, priceStr);
+				new HotelInfo(sql).showHotel(dIn, dOut, hotelStr, cityStr, typeStr, ratingStr, capacityStr, priceStr, order);
 			}
 		};
 	}

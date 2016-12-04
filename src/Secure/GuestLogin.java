@@ -3,14 +3,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 /**
  *
@@ -25,8 +18,9 @@ public class GuestLogin extends JFrame {
     private JLabel jLabel2;
     private JPasswordField txtpassword;
     private JTextField txtusername;
-    private JCheckBox ckboxAdmin;
-    private boolean check;
+    @SuppressWarnings("unused")
+	private JCheckBox ckboxAdmin;
+    private boolean adminChecked;
 
     /**
      * Creates new form GuestLogin
@@ -53,14 +47,14 @@ public class GuestLogin extends JFrame {
         JCheckBox ckboxAdmin = new JCheckBox("Admin login");
         btnSubmit = new JButton("Submit");
         btnNewGuest = new JButton("New Guest");
-        check = false;
+        adminChecked = false;
 
         ckboxAdmin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(check) check = false;
+				if(adminChecked) adminChecked = false;
 				else
-					check = true;
+					adminChecked = true;
 			}
         	
         });
@@ -112,12 +106,12 @@ public class GuestLogin extends JFrame {
     	return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(check) {
+				if(adminChecked) {
 					boolean valid = database.loginAdmin(txtusername.getText(),new String(txtpassword.getPassword()));
 					if(valid) {
 						JOptionPane.showMessageDialog(null,"Welcome admin");
 			    		GuestLogin.this.dispose();
-			    		
+			    		new AdminFrame(database).setVisible(true);
 					} else {
 						JOptionPane.showMessageDialog(null,"Invalid admin username or password","Access Denied",JOptionPane.ERROR_MESSAGE);
 					}
