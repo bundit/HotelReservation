@@ -1,11 +1,23 @@
 package Secure;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 
 public class AdminFrame extends JFrame	{
 	private static final long serialVersionUID = 1L;
@@ -39,6 +51,7 @@ public class AdminFrame extends JFrame	{
 		menu.setPreferredSize(new Dimension(500, 400));
 
 		//buttons
+		JButton archive = new JButton("<html>Archive</html>");
 		JButton editPrice = new JButton("<html>Edit price of a room</html>");
 		JButton editType = new JButton("<html>Edit type of a room</html>");
 		JButton newHotel = new JButton("<html>Add a new hotel</html>");
@@ -52,6 +65,7 @@ public class AdminFrame extends JFrame	{
 		JButton bestHotelsInCity = new JButton("<html>Above avg rated hotels per city</html>");
 		JButton bestOfChainHotels = new JButton("<html>Best of chain hotels</html>");
 
+		archive.addActionListener(getArchiveAction());
 		editPrice.addActionListener(getEditPriceAction());
 		editType.addActionListener(getEditTypeAction());
 		newHotel.addActionListener(getAddHotelAction());
@@ -65,9 +79,12 @@ public class AdminFrame extends JFrame	{
 		bestHotelsInCity.addActionListener(getBestHotelsAction());
 		bestOfChainHotels.addActionListener(getBestChainHotelsAction());
 
-		for(int i = 0; i < 7; i++){
+		for(int i = 0; i < 4; i++){
 			menu.add(new JPanel());
 		}
+		menu.add(archive);
+		menu.add(new JPanel());
+		menu.add(new JPanel());
 		menu.add(viewHotels);
 		menu.add(viewRooms);
 		menu.add(editPrice);
@@ -96,6 +113,37 @@ public class AdminFrame extends JFrame	{
 		mainPanel.add(menu);
 		this.add(mainPanel);
 		this.setVisible(true);
+	}
+
+	private ActionListener getArchiveAction() {
+		return new ActionListener()	{
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JPanel container = new JPanel();
+				container.setLayout(new GridLayout(0,2));
+				
+				JTextField timestamp = new JTextField();
+				
+				timestamp.setText("YYYY-MM-DD HH:MM:SS");
+				
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JLabel("Enter Timestamp"));
+				container.add(timestamp);
+				container.add(new JPanel());
+				container.add(new JPanel());
+				
+				int ok = JOptionPane.showConfirmDialog(null, container, "Archive reservations", JOptionPane.OK_CANCEL_OPTION);
+
+				if(ok == JOptionPane.OK_OPTION){
+					sql.archiveReservations(timestamp.getText());
+				}
+				
+				
+				 
+			}
+			
+		};
 	}
 
 	private ActionListener getEditPriceAction() {
@@ -154,7 +202,49 @@ public class AdminFrame extends JFrame	{
 		return new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				JPanel container = new JPanel();
+				container.setLayout(new GridLayout(0,2));
+				
+				JComboBox<Integer> hotelIDs = new JComboBox<>();
+				ArrayList<Integer> listHotelIds = sql.getHotelIDs();
+				for(int i = 0; i < listHotelIds.size(); i++) {
+					hotelIDs.addItem(listHotelIds.get(i));
+				}
+				JComboBox<String> capacity = new JComboBox<>();
+				capacity.addItem("1-2");
+				capacity.addItem("3-4");
+				capacity.addItem("5-6");
+				capacity.addItem("7-8");
+				
+				JSpinner price = new JSpinner();
+				price.setValue(new Double(100.00));
+				
+				JTextField type = new JTextField("Type of room");
+				
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JLabel("Please Enter New Room Information"));
+				container.add(new JPanel());
+				
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JLabel("Hotel Id:"));
+				container.add(hotelIDs);
+				container.add(new JLabel("Capacity:"));
+				container.add(capacity);
+				container.add(new JLabel("Price:"));
+				container.add(price);
+				container.add(new JLabel("Room Type:"));
+				container.add(type);
+				container.add(new JPanel());
+				container.add(new JPanel());
+				
+				int ok = JOptionPane.showConfirmDialog(null, container, "Add New Room", JOptionPane.OK_CANCEL_OPTION);
 
+				if(ok == JOptionPane.OK_OPTION) {
+					sql.addNewRoom(Integer.parseInt(hotelIDs.getSelectedItem().toString()), capacity.getSelectedItem().toString(), Double.parseDouble(price.getValue().toString()), type.getText());
+				}
+				
 			}			
 		};
 	}
@@ -162,7 +252,39 @@ public class AdminFrame extends JFrame	{
 		return new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				JPanel container = new JPanel();
+				container.setLayout(new GridLayout(0,2));
+				
+				JTextField hotelName = new JTextField("Enter New Hotel Name");
+				JTextField hotelAddress = new JTextField("Enter New Hotel Address");
+				
+				JComboBox<Integer> ratings = new JComboBox<>();
+				ratings.addItem(1);
+				ratings.addItem(2);
+				ratings.addItem(3);
+				ratings.addItem(4);
+				ratings.addItem(5);
+				
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JLabel("Please Enter New Hotel Information"));
+				container.add(new JPanel());				
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JLabel("Hotel Name:"));
+				container.add(hotelName);
+				container.add(new JLabel("Hotel Address:"));
+				container.add(hotelAddress);
+				container.add(new JLabel("Hotel Rating:"));
+				container.add(ratings);				
+				container.add(new JPanel());
+				container.add(new JPanel());
+				
+				int ok = JOptionPane.showConfirmDialog(null, container, "Add New Room", JOptionPane.OK_CANCEL_OPTION);
 
+				if(ok == JOptionPane.OK_OPTION) {
+					sql.addNewHotel(hotelName.getText(), hotelAddress.getText(), Integer.parseInt(ratings.getSelectedItem().toString()));
+				}
 			}			
 		};
 	}
@@ -170,6 +292,30 @@ public class AdminFrame extends JFrame	{
 		return new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
+				JPanel container = new JPanel();
+				container.setLayout(new GridLayout(0,2));
+				JComboBox<Integer> roomSelections = new JComboBox<>();
+				ArrayList<Integer> roomIDs = sql.getRoomIDs();
+				for(int i = 0; i < roomIDs.size(); i++) {
+					roomSelections.addItem(roomIDs.get(i));
+				}
+				
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JLabel("Select a room to delete"));
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JLabel("Room Id: "));
+				container.add(roomSelections);
+				
+				int ok = JOptionPane.showConfirmDialog(null, container, "Delete A Room", JOptionPane.OK_CANCEL_OPTION);
+
+				if(ok == JOptionPane.OK_OPTION) {
+					sql.deleteRoom(Integer.parseInt(roomSelections.getSelectedItem().toString()));
+				}
+				
 				
 			}			
 		};
@@ -179,7 +325,28 @@ public class AdminFrame extends JFrame	{
 		return new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				JPanel container = new JPanel();
+				container.setLayout(new GridLayout(0,2));
+				JComboBox<Integer> hotelSelections = new JComboBox<>();
+				ArrayList<Integer> hotelIDs = sql.getHotelIDs();
+				for(int i = 0; i < hotelIDs.size(); i++) {
+					hotelSelections.addItem(hotelIDs.get(i));
+				}
+				
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JLabel("Select a hotel to delete"));
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JPanel());
+				container.add(new JLabel("Hotel Id: "));
+				container.add(hotelSelections);
+				
+				int ok = JOptionPane.showConfirmDialog(null, container, "Delete A Hotel", JOptionPane.OK_CANCEL_OPTION);
 
+				if(ok == JOptionPane.OK_OPTION) {
+					sql.deleteHotel(Integer.parseInt(hotelSelections.getSelectedItem().toString()));
+				}
 			}			
 		};
 	}

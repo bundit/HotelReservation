@@ -15,7 +15,7 @@ import javax.swing.table.DefaultTableModel;
 class MySqlConnection {
 	private final String DB = "jdbc:mysql://localhost:3306/HotelReservation";
 	private final String DB_USER = "root"; //username for database 
-	private final String DB_PASSWORD = "your password goes here"; //password for database
+	private final String DB_PASSWORD = "Jongsuwan123123"; //password for database
 	private int guest_id;
 	private int admin_id;
 	
@@ -194,7 +194,7 @@ class MySqlConnection {
 			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
 			ps = conn.prepareStatement(sql);
 			ps.setString(1,"" +reservationNum);
-			ps.execute();
+			ps.executeUpdate();
 
 			JOptionPane.showMessageDialog(null,"Reservation " + reservationNum + " Canceled");
 		} catch (Exception e) {
@@ -299,6 +299,7 @@ class MySqlConnection {
 			ps.setString(4, dateOut);
 			ps.setString(5, dateIn);
 			ps.setString(6, dateOut);
+			System.out.println(ps);
 			for(int i = 7; i < bindVariables.size() + 7; i++) {
 				ps.setString(i, bindVariables.get(i-7));
 			}
@@ -355,7 +356,36 @@ class MySqlConnection {
 		}
 		return listOfRoomIds;
 	}
+	
+	ArrayList<Integer> getHotelIDs()	 {
+		Connection conn = null;
+		PreparedStatement s = null;
+		ResultSet rs = null;
+		ArrayList<Integer> listOfHotelIds = new ArrayList<>();
 
+		String sql = "SELECT hotel_id\n" 
+				+ "FROM hotel\n";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			s = conn.prepareStatement(sql);
+			
+			rs = s.executeQuery();
+			
+			while(rs.next()) {
+				
+				listOfHotelIds.add(rs.getInt("hotel_id"));	
+			}
+			
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(s != null) s.close();} catch (Exception e){}
+			try{if(rs != null) rs.close();} catch (Exception e){}
+		}
+		return listOfHotelIds;
+	}
+	
 	/**
 	 * Returns the reservation number
 	 * @param roomID
@@ -366,7 +396,7 @@ class MySqlConnection {
 	 * @param cost
 	 * @return the reservation number if successful. -1 if unsuccessful
 	 */
-	int createNewReservation(String roomID, String hotelID, int guestID,String checkIn, String checkOut, String cost) {
+	int createNewReservation(String roomID, String hotelID, int guestID,String checkIn, String checkOut, double cost) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -382,7 +412,7 @@ class MySqlConnection {
 			ps.setInt(3,guestID);
 			ps.setString(4,checkIn);
 			ps.setString(5,checkOut);
-			ps.setString(6,cost);
+			ps.setDouble(6,cost);
 			
 			ps.executeUpdate();
 			
@@ -391,6 +421,7 @@ class MySqlConnection {
 			if(rs.next()) {
 				reserveID = rs.getInt(1);
 			}
+			if(reserveID == -1) JOptionPane.showMessageDialog(null, "Error creating reservation");
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
@@ -461,6 +492,7 @@ class MySqlConnection {
 		
 		String sql = "SELECT guest.guest_id, username, COUNT(reservation.guest_id) AS visits\n"
 				+ "FROM guest LEFT OUTER JOIN reservation ON guest.guest_id = reservation.guest_id\n"
+				+ "WHERE checkoutdate <= CURDATE()\n"
 				+ "GROUP BY reservation.guest_id\n"
 				+ "ORDER BY visits DESC\n";
 		
@@ -486,10 +518,10 @@ class MySqlConnection {
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		
-		String sql = "SELECT room.room_id, COUNT(reservation.reserve_id) AS NumberOfTimesReserved\n"
-				+ "FROM room LEFT OUTER JOIN reservation ON room.room_id = reservation.room_id\n"
+		String sql = "SELECT room.Room_id, name AS Hotel, address AS City, COUNT(reservation.reserve_id) AS NumberOfTimesReserved\n"
+				+ "FROM (room JOIN hotel ON hotel.hotel_id = room.hotel_id) LEFT OUTER JOIN reservation ON room.room_id = reservation.room_id\n"
 				+ "GROUP BY room.room_id\n"
-				+ "ORDER BY NumberOfTimesReserved DESC;\n";
+				+ "ORDER BY NumberOfTimesReserved DESC, name, address;\n";
 		
 		try {
 			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
@@ -632,10 +664,118 @@ class MySqlConnection {
 	}	
 	
 	
-	void addNewHotel(String name, String city, String star) {
-		
+	void addNewHotel(String name, String city, int star) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		String sql = "INSERT\n"
+				+ "INTO hotel\n"
+				+ "VALUES(null,?,?,0,?)";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, name);
+			ps.setString(2, city);
+			ps.setInt(3, star);
+			ps.executeUpdate();
+
+			JOptionPane.showMessageDialog(null,"New Hotel Created!");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+		}
 	}
-	void addNewRoom(int roomID, int hotelID, String capacity, double price, String type) {
+	
+	void deleteHotel(int hotelID) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		String sql = "DELETE\n"
+				+ "FROM hotel\n"
+				+ "WhERE hotel_id = ?;";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1,hotelID);
+			ps.executeUpdate();
+
+			JOptionPane.showMessageDialog(null,"Hotel " + hotelID + " has been deleted.");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+		}
+
+	}
+	
+	void addNewRoom(int hotelID, String capacity, double price, String type) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		String sql = "INSERT\n"
+				+ "INTO room\n"
+				+ "VALUES(null,?,?,?,?)";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, hotelID);
+			ps.setString(2, capacity);
+			ps.setDouble(3, price);
+			ps.setString(4, type);
+			ps.executeUpdate();
+
+			JOptionPane.showMessageDialog(null,"New Room Created!");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+		}
+	}
+	void deleteRoom(int roomID) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		String sql = "DELETE\n"
+				+ "FROM room\n"
+				+ "WhERE room_id = ?;";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1,roomID);
+			ps.executeUpdate();
+
+			JOptionPane.showMessageDialog(null,"Room " + roomID + " has been deleted.");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+		}
+
+	}
+	public void archiveReservations(String timestamp) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		CallableStatement cs;
+
+		String sql = "{CALL Archive_Reservations(?)}";
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			cs = conn.prepareCall(sql);
+			cs.setString(1, timestamp);
+			cs.executeUpdate();
+			
+			JOptionPane.showMessageDialog(null,"Reservations before " + timestamp + " have been archived.");
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+		}
 		
 	}
 	
@@ -663,5 +803,10 @@ class MySqlConnection {
 	    }
 	    return new DefaultTableModel(data, columnNames);
 	}
+
+	
+	
+
+	
 }
 

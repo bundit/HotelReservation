@@ -70,6 +70,75 @@ public class MainFrame extends JFrame{
 		this.add(mainPanel);
 		this.setVisible(true);
 	}
+	
+	/**
+	 * Gets the cancel button action 
+	 * Cancels a reservation based on the reservation number 
+	 * @return the cancel button action for its action listener
+	 */
+	private ActionListener getCancelAction(){
+		return new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String uInput = JOptionPane.showInputDialog(null,"Input your reservation number to cancel");
+				
+				if(uInput == null || uInput.isEmpty()) {
+					return;
+				}
+				//input length must be less than 11 digits
+				if(uInput.length() > 10) {
+					JOptionPane.showMessageDialog(null, "Reservation Number does not exist");
+					actionPerformed(e);
+					return;
+				} else { //check user input
+					for (int i = 0; i < uInput.length(); i++) {
+						if (!Character.isDigit(uInput.charAt(i))){
+							JOptionPane.showMessageDialog(null, "Please enter digits only");
+							//actionPerformed(e);
+							return;
+						}
+					}
+				}
+
+				MainFrame.this.sql.cancelReservation(Integer.parseInt(uInput));
+			}
+		};
+	}
+	/**
+	 * Gets the view button action listener
+	 * Shows the user a view of the reservation by the reservation number inputted
+	 * @return the view button action for its action listener
+	 */
+	private ActionListener getViewAction(){
+		return new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String uInput = JOptionPane.showInputDialog("Input your reservation number to view");
+
+				//check user input
+				if(uInput == null || uInput.isEmpty()) {
+					return;
+				} 
+				
+				if(uInput.length() > 10) {
+					JOptionPane.showMessageDialog(null, "Reservation Number does not exist");
+					actionPerformed(e);
+					return;
+				} else {
+					for (int i = 0; i < uInput.length(); i++) {
+						if (!Character.isDigit(uInput.charAt(i))){
+							JOptionPane.showMessageDialog(null, "Please enter digits only");
+							//actionPerformed(e);
+							return;
+						}
+					}
+				}
+
+				MainFrame.this.sql.viewReservation(Integer.parseInt(uInput));
+			}
+		};
+	}
+	
 	/**
 	 * Action for search JButton
 	 * Gives a form for the user to input fields to search for desired hotel rooms
@@ -108,12 +177,7 @@ public class MainFrame extends JFrame{
 				for(int i = 1; i < 6; i++) {
 					ratings.addItem(i + "");
 				}
-//				ratings.addItem("1");
-//				ratings.addItem("2");
-//				ratings.addItem("3");
-//				ratings.addItem("4");
-//				ratings.addItem("5");
-				
+
 				JComboBox<String> capacity = new JComboBox<>();
 				capacity.addItem("Any Capacity");
 				capacity.addItem("1-2");
@@ -183,7 +247,7 @@ public class MainFrame extends JFrame{
 				
 				JOptionPane.showConfirmDialog(null, info, "Find Hotel Rooms", JOptionPane.OK_CANCEL_OPTION);
 				
-				 DateFormat dateFormat = new SimpleDateFormat("yyyy-dd-MM");
+				 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				 
 				 String dIn = dateFormat.format(dayin.getValue());
 				 String dOut = dateFormat.format(dayout.getValue());
@@ -197,73 +261,6 @@ public class MainFrame extends JFrame{
 				 String order = orderBy.getSelectedItem().toString();
 				
 				new HotelInfo(sql).showHotel(dIn, dOut, hotelStr, cityStr, typeStr, ratingStr, capacityStr, priceStr, order);
-			}
-		};
-	}
-	/**
-	 * Gets the cancel button action 
-	 * Cancels a reservation based on the reservation number 
-	 * @return the cancel button action for its action listener
-	 */
-	private ActionListener getCancelAction(){
-		return new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String uInput = JOptionPane.showInputDialog(null,"Input your reservation number to cancel");
-				
-				if(uInput == null || uInput.isEmpty()) {
-					return;
-				}
-				//input length must be less than 11 digits
-				if(uInput.length() > 10) {
-					JOptionPane.showMessageDialog(null, "Reservation Number does not exist");
-					actionPerformed(e);
-					return;
-				} else { //check user input
-					for (int i = 0; i < uInput.length(); i++) {
-						if (!Character.isDigit(uInput.charAt(i))){
-							JOptionPane.showMessageDialog(null, "Please enter digits only");
-							//actionPerformed(e);
-							return;
-						}
-					}
-				}
-
-				MainFrame.this.sql.cancelReservation(Integer.parseInt(uInput));
-			}
-		};
-	}
-	/**
-	 * Gets the view button action listener
-	 * Shows the user a view of the reservation by the reservation number inputted
-	 * @return the view button action for its action listener
-	 */
-	private ActionListener getViewAction(){
-		return new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String uInput = JOptionPane.showInputDialog("Input your reservation number to view");
-
-				//check user input
-				if(uInput == null || uInput.isEmpty()) {
-					return;
-				} 
-				
-				if(uInput.length() > 10) {
-					JOptionPane.showMessageDialog(null, "Reservation Number does not exist");
-					actionPerformed(e);
-					return;
-				} else {
-					for (int i = 0; i < uInput.length(); i++) {
-						if (!Character.isDigit(uInput.charAt(i))){
-							JOptionPane.showMessageDialog(null, "Please enter digits only");
-							//actionPerformed(e);
-							return;
-						}
-					}
-				}
-
-				MainFrame.this.sql.viewReservation(Integer.parseInt(uInput));
 			}
 		};
 	}

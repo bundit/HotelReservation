@@ -6,6 +6,9 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -58,13 +61,17 @@ public class HotelInfo extends javax.swing.JFrame {
     			resultsContainer.add(new JLabel(price + ""));
     			
     			JButton btnReserve = new JButton("Reserve this room");
+    			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
+    			LocalDate before = LocalDate.parse(dateIn, formatter);
+    			LocalDate after = LocalDate.parse(dateOut, formatter);
+    			int days = (int)ChronoUnit.DAYS.between(before, after);
     			btnReserve.addActionListener(new ActionListener(){
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						int result = JOptionPane.showConfirmDialog((Component) null, "Are you sure you want to reserve this room?",
 						        "Confirmation", JOptionPane.YES_NO_OPTION);
 						if(result == JOptionPane.YES_OPTION) {
-							int reserveID = HotelInfo.this.sql.createNewReservation(roomID, hotelID, guestID, dateIn, dateOut, price);
+							int reserveID = HotelInfo.this.sql.createNewReservation(roomID, hotelID, guestID, dateIn, dateOut, days * Double.parseDouble(price));
 							JOptionPane.showConfirmDialog((Component) null, "Your reservation number is: " + reserveID + ". Please keep this in your records.",
 							        "Reservation Confirmed!", JOptionPane.OK_CANCEL_OPTION);
 						} else {
