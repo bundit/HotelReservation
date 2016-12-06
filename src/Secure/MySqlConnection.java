@@ -15,7 +15,7 @@ import javax.swing.table.DefaultTableModel;
 class MySqlConnection {
 	private final String DB = "jdbc:mysql://localhost:3306/HotelReservation";
 	private final String DB_USER = "root"; //username for database 
-	private final String DB_PASSWORD = "Jongsuwan123123"; //password for database
+	private final String DB_PASSWORD = "your password"; //password for database
 	private int guest_id;
 	private int admin_id;
 	
@@ -244,90 +244,10 @@ class MySqlConnection {
 			try{if(rs != null) rs.close();} catch (Exception e){}
 		}
 	}
-	
-	ArrayList<String> getHotelInfoForGuest(String dateIn, String dateOut, String hotelName, 
-		String locations, String roomType, String minimumStars, String capacity, String maxPrice, String order){
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		ArrayList<String> toReturn = new ArrayList<>();
-		ArrayList<String> bindVariables = new ArrayList<>();
-		
-		String sql = "SELECT *\n"
-				+ "FROM room JOIN hotel ON room.hotel_id = hotel.hotel_id\n"
-				+ "WHERE room_id NOT IN ("
-										+ "SELECT 	r1.room_id\n"
-										+ "FROM 	room as r1 join reservation as r2 on r1.room_id = r2.room_id\n"
-										+ "WHERE 	(checkindate <= ? AND checkoutdate >= ?)\n"
-													+ "OR (checkindate < ? AND checkoutdate >= ?)\n"
-													+ "OR (? <= checkindate AND ? >= checkindate)\n"
-									+ ")\n";
-		
-		if(!hotelName.equals("All Hotels")) {
-			sql += "AND hotel.name = ?\n";
-			bindVariables.add(hotelName);
-		}
-		if(!locations.equals("All Cities")) {
-			sql += "AND hotel.address = ?\n";
-			bindVariables.add(locations);
-		}
-		if(!roomType.equals("Any Type")) {
-			sql += "AND room.type = ?\n";
-			bindVariables.add(roomType);
-		}
-		if(!minimumStars.equals("Any Rating")) {
-			sql += "AND hotel.star >= ?\n";
-			bindVariables.add(minimumStars);
-		}
-		if(!capacity.equals("Any Capacity")) {
-			sql += "AND room.capacity = ?\n";
-			bindVariables.add(capacity);
-		}
-		if(!maxPrice.equals("Any Price")) {
-			sql += "AND room.price <= ?\n";
-			bindVariables.add(maxPrice);
-		}
-		if(!order.equals("Any Order")) sql += "ORDER BY " + order + "\n";
-		
-		try {
-			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
-	
-			ps = conn.prepareStatement(sql);
-			ps.setString(1, dateIn);
-			ps.setString(2, dateOut);
-			ps.setString(3, dateOut);
-			ps.setString(4, dateOut);
-			ps.setString(5, dateIn);
-			ps.setString(6, dateOut);
-			System.out.println(ps);
-			for(int i = 7; i < bindVariables.size() + 7; i++) {
-				ps.setString(i, bindVariables.get(i-7));
-			}
-
-			rs = ps.executeQuery();
-
-			System.out.println(ps.toString());
-			while(rs.next()) {
-				toReturn.add(rs.getString("name"));
-				toReturn.add(rs.getString("address"));
-				toReturn.add(rs.getString("type"));
-				toReturn.add(rs.getString("star"));
-				toReturn.add(rs.getString("capacity"));
-				toReturn.add(rs.getString("price"));
-				toReturn.add(rs.getString("room_id"));
-				toReturn.add(rs.getString("hotel_id"));
-			}
-			
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e);
-			System.out.println("Not correctly working");
-		} finally {
-			try{if(conn != null) conn.close();} catch (Exception e){}
-			try{if(ps != null) ps.close();} catch (Exception e){}
-			try{if(rs != null) rs.close();} catch (Exception e){}
-		}
-		return toReturn;
-	}
+	/**
+	 * Return a list of all room ids in the database
+	 * @return
+	 */
 	ArrayList<Integer> getRoomIDs()	 {
 		Connection conn = null;
 		PreparedStatement s = null;
@@ -356,7 +276,10 @@ class MySqlConnection {
 		}
 		return listOfRoomIds;
 	}
-	
+	/**
+	 * Returns a list of all hotel ids in the database
+	 * @return
+	 */
 	ArrayList<Integer> getHotelIDs()	 {
 		Connection conn = null;
 		PreparedStatement s = null;
@@ -431,7 +354,11 @@ class MySqlConnection {
 		}
 		return reserveID;
 	}
-	
+	/**
+	 * Edit the price of a specific room
+	 * @param roomID
+	 * @param price
+	 */
 	void editPriceOfRoom(int roomID, int price) {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -457,7 +384,11 @@ class MySqlConnection {
 			try{if(ps != null) ps.close();} catch (Exception e){}
 		}
 	}
-	
+	/**
+	 * Edit the type of a specific room
+	 * @param roomID
+	 * @param newType
+	 */
 	void editTypeOfRoom(int roomID, String newType) {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -483,8 +414,9 @@ class MySqlConnection {
 			try{if(ps != null) ps.close();} catch (Exception e){}
 		}
 	}
-	
-	
+	/**
+	 * Display guests ranked by the number of visits 
+	 */
 	void mostFrequentGuests() {
 		Connection conn = null;
 		PreparedStatement s = null;
@@ -602,7 +534,7 @@ class MySqlConnection {
 		PreparedStatement s = null;
 		ResultSet rs = null;
 		
-		String sql = "SELECT name, hotel_id, star\n"
+		String sql = "SELECT name, hotel_id, address, star\n"
 				+ "FROM hotel as h1\n"
 				+ "WHERE star > \n"
 				+ "(\n"
@@ -639,7 +571,7 @@ class MySqlConnection {
 				+ "FROM hotel as h1\n"
 				+ "WHERE  star >\n"
 				+ "(\n"
-				+ "SELECT AVG(h2.star)\n"
+				+ "SELECT AVG(h2.star) as AvgForThisCity\n"
 				+ "FROM hotel as h2\n"
 				+ "WHERE h1.address = h2.address\n"
 				+ ")\n"
@@ -662,6 +594,32 @@ class MySqlConnection {
 			try{if(rs != null) rs.close();} catch (Exception e){}
 		}
 	}	
+	void avgHotelRatingByCity() {
+		Connection conn = null;
+		PreparedStatement s = null;
+		ResultSet rs = null;
+		
+		String sql = "SELECT address, avg(star) AS AverageRatingOfThisCity\n"
+				+ "FROM hotel\n"
+				+ "GROUP BY address;\n";
+		
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+			s = conn.prepareStatement(sql);
+						
+			rs = s.executeQuery();
+			JTable hotels = new JTable(buildTable(rs));
+			JOptionPane.showMessageDialog(null, new JScrollPane(hotels));
+			
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+			System.out.println("Not correctly working");
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(s != null) s.close();} catch (Exception e){}
+			try{if(rs != null) rs.close();} catch (Exception e){}
+		}
+	}
 	
 	
 	void addNewHotel(String name, String city, int star) {
@@ -779,6 +737,91 @@ class MySqlConnection {
 		
 	}
 	
+
+	ArrayList<String> getHotelInfoForGuest(String dateIn, String dateOut, String hotelName, 
+		String locations, String roomType, String minimumStars, String capacity, String maxPrice, String order){
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<String> toReturn = new ArrayList<>();
+		ArrayList<String> bindVariables = new ArrayList<>();
+		
+		String sql = "SELECT *\n"
+				+ "FROM room JOIN hotel ON room.hotel_id = hotel.hotel_id\n"
+				+ "WHERE room_id NOT IN ("
+										+ "SELECT 	r1.room_id\n"
+										+ "FROM 	room as r1 join reservation as r2 on r1.room_id = r2.room_id\n"
+										+ "WHERE 	(checkindate <= ? AND checkoutdate >= ?)\n"
+													+ "OR (checkindate < ? AND checkoutdate >= ?)\n"
+													+ "OR (? <= checkindate AND ? >= checkindate)\n"
+									+ ")\n";
+		
+		if(!hotelName.equals("All Hotels")) {
+			sql += "AND hotel.name = ?\n";
+			bindVariables.add(hotelName);
+		}
+		if(!locations.equals("All Cities")) {
+			sql += "AND hotel.address = ?\n";
+			bindVariables.add(locations);
+		}
+		if(!roomType.equals("Any Type")) {
+			sql += "AND room.type = ?\n";
+			bindVariables.add(roomType);
+		}
+		if(!minimumStars.equals("Any Rating")) {
+			sql += "AND hotel.star >= ?\n";
+			bindVariables.add(minimumStars);
+		}
+		if(!capacity.equals("Any Capacity")) {
+			sql += "AND room.capacity = ?\n";
+			bindVariables.add(capacity);
+		}
+		if(!maxPrice.equals("Any Price")) {
+			sql += "AND room.price <= ?\n";
+			bindVariables.add(maxPrice);
+		}
+		if(!order.equals("Any Order")) sql += "ORDER BY " + order + "\n";
+		
+		try {
+			conn = DriverManager.getConnection(DB, DB_USER, DB_PASSWORD);
+	
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, dateIn);
+			ps.setString(2, dateOut);
+			ps.setString(3, dateOut);
+			ps.setString(4, dateOut);
+			ps.setString(5, dateIn);
+			ps.setString(6, dateOut);
+			System.out.println(ps);
+			for(int i = 7; i < bindVariables.size() + 7; i++) {
+				ps.setString(i, bindVariables.get(i-7));
+			}
+
+			rs = ps.executeQuery();
+
+			System.out.println(ps.toString());
+			while(rs.next()) {
+				toReturn.add(rs.getString("name"));
+				toReturn.add(rs.getString("address"));
+				toReturn.add(rs.getString("type"));
+				toReturn.add(rs.getString("star"));
+				toReturn.add(rs.getString("capacity"));
+				toReturn.add(rs.getString("price"));
+				toReturn.add(rs.getString("room_id"));
+				toReturn.add(rs.getString("hotel_id"));
+			}
+			
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e);
+			System.out.println("Not correctly working");
+		} finally {
+			try{if(conn != null) conn.close();} catch (Exception e){}
+			try{if(ps != null) ps.close();} catch (Exception e){}
+			try{if(rs != null) rs.close();} catch (Exception e){}
+		}
+		return toReturn;
+	}
+	
 	/* Code copied from function buildTableModel obtained from http://stackoverflow.com/questions/10620448/most-simple-code-to-populate-jtable-from-resultset */
 	private static DefaultTableModel buildTable(ResultSet rs)
 	        throws SQLException {
@@ -803,9 +846,6 @@ class MySqlConnection {
 	    }
 	    return new DefaultTableModel(data, columnNames);
 	}
-
-	
-	
 
 	
 }

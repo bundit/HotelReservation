@@ -5,10 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -64,6 +61,7 @@ public class AdminFrame extends JFrame	{
 		JButton topRooms = new JButton("<html>View frequented rooms</html>");
 		JButton bestHotelsInCity = new JButton("<html>Above avg rated hotels per city</html>");
 		JButton bestOfChainHotels = new JButton("<html>Best of chain hotels</html>");
+		JButton avgRatingByCity = new JButton("<html>Avg hotel rating by city</html>");
 
 		archive.addActionListener(getArchiveAction());
 		editPrice.addActionListener(getEditPriceAction());
@@ -78,33 +76,36 @@ public class AdminFrame extends JFrame	{
 		topRooms.addActionListener(getTopRoomsAction());
 		bestHotelsInCity.addActionListener(getBestHotelsAction());
 		bestOfChainHotels.addActionListener(getBestChainHotelsAction());
+		avgRatingByCity.addActionListener(getAvgHotelByCityAction());
+		
 
-		for(int i = 0; i < 4; i++){
+		for(int i = 0; i < 3; i++){
 			menu.add(new JPanel());
 		}
 		menu.add(archive);
-		menu.add(new JPanel());
-		menu.add(new JPanel());
 		menu.add(viewHotels);
+		menu.add(new JPanel());
+		menu.add(new JPanel());
 		menu.add(viewRooms);
 		menu.add(editPrice);
 		menu.add(editType);
-
-		menu.add(new JPanel());
-		menu.add(new JPanel());
-
 		menu.add(newHotel);
+		
+		menu.add(new JPanel());
+		menu.add(new JPanel());
+		
 		menu.add(deleteHotel);
 		menu.add(newRoom);
 		menu.add(deleteRoom);
-
-		menu.add(new JPanel());
-		menu.add(new JPanel());
-
 		menu.add(topGuests);
+		
+		menu.add(new JPanel());
+		menu.add(new JPanel());
+		
 		menu.add(topRooms);
 		menu.add(bestHotelsInCity);
 		menu.add(bestOfChainHotels);
+		menu.add(avgRatingByCity);
 
 		for(int i = 0; i < 7; i++){
 			menu.add(new JPanel());
@@ -124,7 +125,7 @@ public class AdminFrame extends JFrame	{
 				
 				JTextField timestamp = new JTextField();
 				
-				timestamp.setText("YYYY-MM-DD HH:MM:SS");
+				timestamp.setText("YYYY-MM-DD hh:mm:ss");
 				
 				container.add(new JPanel());
 				container.add(new JPanel());
@@ -137,6 +138,7 @@ public class AdminFrame extends JFrame	{
 
 				if(ok == JOptionPane.OK_OPTION){
 					sql.archiveReservations(timestamp.getText());
+					//System.out.println(timestamp.getText());
 				}
 				
 				
@@ -443,7 +445,17 @@ public class AdminFrame extends JFrame	{
 
 		};
 	}
-
+	
+	private ActionListener getAvgHotelByCityAction() {
+		return new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				sql.avgHotelRatingByCity();
+			}
+			
+		};
+	}
+	/*
 	public static void main(String... args) {
 		MySqlConnection sqlcon = new MySqlConnection(); //create the model and pass it to the view/controller
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -452,4 +464,5 @@ public class AdminFrame extends JFrame	{
 			}
 		});
 	}
+	*/
 }
