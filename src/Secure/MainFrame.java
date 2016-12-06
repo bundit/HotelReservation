@@ -70,7 +70,7 @@ public class MainFrame extends JFrame{
 		this.add(mainPanel);
 		this.setVisible(true);
 	}
-	
+
 	/**
 	 * Gets the cancel button action 
 	 * Cancels a reservation based on the reservation number 
@@ -81,7 +81,7 @@ public class MainFrame extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String uInput = JOptionPane.showInputDialog(null,"Input your reservation number to cancel");
-				
+
 				if(uInput == null || uInput.isEmpty()) {
 					return;
 				}
@@ -119,7 +119,7 @@ public class MainFrame extends JFrame{
 				if(uInput == null || uInput.isEmpty()) {
 					return;
 				} 
-				
+
 				if(uInput.length() > 10) {
 					JOptionPane.showMessageDialog(null, "Reservation Number does not exist");
 					actionPerformed(e);
@@ -138,7 +138,7 @@ public class MainFrame extends JFrame{
 			}
 		};
 	}
-	
+
 	/**
 	 * Action for search JButton
 	 * Gives a form for the user to input fields to search for desired hotel rooms
@@ -150,28 +150,28 @@ public class MainFrame extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				JPanel info = new JPanel();
 				info.setLayout(new GridLayout(0,2));
-				
+
 				ArrayList<String> hotelNames = sql.getListOfDetails("hotel", "name");
 				JComboBox<String> hotels = new JComboBox<>();
 				hotels.addItem("All Hotels");
 				for(int i = 0; i < hotelNames.size(); i++) {
 					hotels.addItem(hotelNames.get(i));
 				}
-				
+
 				ArrayList<String> cityNames = sql.getListOfDetails("hotel","address");
 				JComboBox<String> cities = new JComboBox<>();
 				cities.addItem("All Cities");
 				for(int i = 0; i < cityNames.size(); i++) {
 					cities.addItem(cityNames.get(i));
 				}
-				
+
 				ArrayList<String> typesList = sql.getListOfDetails("room", "type");
 				JComboBox<String> types = new JComboBox<>();
 				types.addItem("Any Type");
 				for(int i = 0; i < typesList.size(); i++) {
 					types.addItem(typesList.get(i));
 				}
-				
+
 				JComboBox<String> ratings = new JComboBox<>();
 				ratings.addItem("Any Rating");
 				for(int i = 1; i < 6; i++) {
@@ -183,14 +183,14 @@ public class MainFrame extends JFrame{
 				capacity.addItem("1-2");
 				capacity.addItem("3-4");
 				capacity.addItem("5-6");
-				
+
 				JComboBox<String> prices = new JComboBox<>();
 				prices.addItem("Any Price");
 				prices.addItem("50");
 				prices.addItem("100");
 				prices.addItem("150");
 				prices.addItem("200");
-				
+
 				JComboBox<String> orderBy = new JComboBox<>();
 				orderBy.addItem("Any Order");
 				orderBy.addItem("Name");
@@ -199,19 +199,19 @@ public class MainFrame extends JFrame{
 				orderBy.addItem("Star");
 				orderBy.addItem("Capacity");
 				orderBy.addItem("Price");
-				
+
 				info.add(new JPanel());
 				info.add(new JPanel());
 				info.add(new JLabel("Check In"));
 				SpinnerDateModel spinModelIn = new SpinnerDateModel();
-			    JSpinner dayin = new JSpinner(spinModelIn);
+				JSpinner dayin = new JSpinner(spinModelIn);
 				dayin.setEditor(new JSpinner.DateEditor(dayin,"dd/MM/yyyy"));
 				info.add(dayin);
 				info.add(new JPanel());
 				info.add(new JPanel());
 				info.add(new JLabel("Check Out"));
 				SpinnerDateModel spinModelOut = new SpinnerDateModel();
-			    JSpinner dayout = new JSpinner(spinModelOut);
+				JSpinner dayout = new JSpinner(spinModelOut);
 				dayout.setEditor(new JSpinner.DateEditor(dayout,"dd/MM/yyyy"));
 				info.add(dayout);
 				info.add(new JPanel());
@@ -244,22 +244,22 @@ public class MainFrame extends JFrame{
 				info.add(orderBy);
 				info.add(new JPanel());
 				info.add(new JPanel());
-				
+
 				JOptionPane.showConfirmDialog(null, info, "Find Hotel Rooms", JOptionPane.OK_CANCEL_OPTION);
-				
-				 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				 
-				 String dIn = dateFormat.format(dayin.getValue());
-				 String dOut = dateFormat.format(dayout.getValue());
-				 
-				 String hotelStr = hotels.getSelectedItem().toString();
-				 String cityStr = cities.getSelectedItem().toString();
-				 String typeStr = types.getSelectedItem().toString();
-				 String ratingStr = ratings.getSelectedItem().toString();
-				 String capacityStr = capacity.getSelectedItem().toString();
-				 String priceStr = prices.getSelectedItem().toString();
-				 String order = orderBy.getSelectedItem().toString();
-				
+
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+				String dIn = dateFormat.format(dayin.getValue());
+				String dOut = dateFormat.format(dayout.getValue());
+
+				String hotelStr = hotels.getSelectedItem().toString();
+				String cityStr = cities.getSelectedItem().toString();
+				String typeStr = types.getSelectedItem().toString();
+				String ratingStr = ratings.getSelectedItem().toString();
+				String capacityStr = capacity.getSelectedItem().toString();
+				String priceStr = prices.getSelectedItem().toString();
+				String order = orderBy.getSelectedItem().toString();
+
 				new HotelInfo(sql).showHotel(dIn, dOut, hotelStr, cityStr, typeStr, ratingStr, capacityStr, priceStr, order);
 			}
 		};
