@@ -1,8 +1,16 @@
-
 package Secure;
-import java.sql.*;
+
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
+
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -422,7 +430,7 @@ class MySqlConnection {
 		ResultSet rs = null;
 
 		String sql = "SELECT guest.guest_id, username, COUNT(reservation.guest_id) AS visits\n"
-				+ "FROM guest LEFT OUTER JOIN reservation ON guest.guest_id = reservation.guest_id\n"
+				+ "FROM guest JOIN reservation ON guest.guest_id = reservation.guest_id\n"
 				+ "WHERE checkoutdate <= CURDATE()\n"
 				+ "GROUP BY guest.guest_id\n"
 				+ "ORDER BY visits DESC\n";
